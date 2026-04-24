@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-insert-movies
+      author: cine_dev
+      labels: "BD-01-dev,dml,inserts,movies"
+      comment: Inserta datos iniciales de películas.
+      changes:
+        - sqlFile:
+            path: 001_insert_movies.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: 03_rollbacks/02_dml/00_inserts/004_rollback_movies.sql
+            relativeToChangelogFile: false
+            stripComments: false
+
+  - changeSet:
+      id: 002-insert-clients
+      author: cine_dev
+      labels: "BD-01-dev,dml,inserts,clients"
+      comment: Inserta datos iniciales de clientes.
+      changes:
+        - sqlFile:
+            path: 002_insert_clients.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: 03_rollbacks/02_dml/00_inserts/003_rollback_clients.sql
+            relativeToChangelogFile: false
+            stripComments: false
+
+  - changeSet:
+      id: 003-insert-screening-rooms
+      author: cine_dev
+      labels: "BD-01-dev,dml,inserts,screening_rooms"
+      comment: Inserta datos iniciales de salas de proyección.
+      changes:
+        - sqlFile:
+            path: 003_insert_screening_rooms.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: 03_rollbacks/02_dml/00_inserts/002_rollback_screening_rooms.sql
+            relativeToChangelogFile: false
+            stripComments: false
+
+  - changeSet:
+      id: 004-insert-rentals
+      author: cine_dev
+      labels: "BD-01-dev,dml,inserts,rentals"
+      comment: Inserta datos iniciales de alquileres.
+      changes:
+        - sqlFile:
+            path: 004_insert_rentals.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: 03_rollbacks/02_dml/00_inserts/001_rollback_rentals.sql
+            relativeToChangelogFile: false
+            stripComments: false

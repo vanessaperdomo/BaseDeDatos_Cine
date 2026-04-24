@@ -1,0 +1,6 @@
+
+changeLogFile=changelog-master.yaml
+url=jdbc:postgresql://localhost:5433/cine_db
+username=cine_user
+password=cine_password
+driver=org.postgresql.Driver

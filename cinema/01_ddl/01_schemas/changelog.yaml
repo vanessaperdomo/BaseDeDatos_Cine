@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: sch-001-create-cine-schema
+      author: cine_dev
+      labels: "BD-01-dev,ddl,schemas"
+      comment: Crea el schema principal del sistema de cine.
+      changes:
+        - sqlFile:
+            path: 001_create_schema.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sql:
+            sql: DROP SCHEMA IF EXISTS cine CASCADE;

@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS cine.movies CASCADE;

@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: cine-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - cine_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  liquibase:
+    build:
+      context: ./docker/liquibase
+      dockerfile: Dockerfile
+    container_name: cine-liquibase
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    volumes:
+      - ./:/liquibase/changelog
+    command:
+      - --search-path=/liquibase/changelog
+      - --changeLogFile=changelog-master.yaml
+      - --url=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - --username=${POSTGRES_USER}
+      - --password=${POSTGRES_PASSWORD}
+      - update
+    # Liquibase es un proceso de migración, no un servidor:
+    # arranca, aplica los changesets pendientes y termina con código 0.
+    # restart: on-failure lo vuelve a intentar si falla por un error
+    # transitorio (ej: postgres aún no listo), pero no queda corriendo
+    # de forma permanente — ese es el comportamiento correcto.
+    restart: on-failure
+
+volumes:
+  cine_data:

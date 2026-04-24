@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-movies-table
+      author: cine_dev
+      changes:
+        - sqlFile:
+            path: 001_create_movies_table.sql
+            relativeToChangelogFile: true
+      rollback:
+        - sqlFile:
+            path: 03_rollbacks/01_ddl/01_tables/004_rollback_movies.sql
+            relativeToChangelogFile: false
+
+  - changeSet:
+      id: 002-create-clients-table
+      author: cine_dev
+      changes:
+        - sqlFile:
+            path: 002_create_clients_table.sql
+            relativeToChangelogFile: true
+      rollback:
+        - sqlFile:
+            path: 03_rollbacks/01_ddl/01_tables/003_rollback_clients.sql
+            relativeToChangelogFile: false
+
+  - changeSet:
+      id: 003-create-screening-rooms-table
+      author: cine_dev
+      changes:
+        - sqlFile:
+            path: 003_create_screening_rooms_table.sql
+            relativeToChangelogFile: true
+      rollback:
+        - sqlFile:
+            path: 03_rollbacks/01_ddl/01_tables/002_rollback_screening_rooms.sql
+            relativeToChangelogFile: false
+
+  - changeSet:
+      id: 004-create-rentals-table
+      author: cine_dev
+      changes:
+        - sqlFile:
+            path: 004_create_rentals_table.sql
+            relativeToChangelogFile: true
+      rollback:
+        - sqlFile:
+            path: 03_rollbacks/01_ddl/01_tables/001_rollback_rentals.sql
+            relativeToChangelogFile: false
