@@ -1,0 +1,74 @@
+name: Cinema DB - CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-db:
+    name: Validate DB Structure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check required SQL files exist
+        run: |
+          echo "Verificando archivos obligatorios..."
+          test -f cinema/01_ddl/01_schemas/001_create_schema.sql         && echo "schema OK"        || (echo "schema NO" && exit 1)
+          test -f cinema/01_ddl/03_tables/001_create_movies_table.sql    && echo "movies OK"         || (echo "movies NO" && exit 1)
+          test -f cinema/01_ddl/03_tables/002_create_clients_table.sql   && echo "clients OK"        || (echo "clients NO" && exit 1)
+          test -f cinema/01_ddl/03_tables/003_create_screening_rooms_table.sql && echo "rooms OK"    || (echo "rooms NO" && exit 1)
+          test -f cinema/01_ddl/03_tables/004_create_rentals_table.sql   && echo "rentals OK"        || (echo "rentals NO" && exit 1)
+          test -f cinema/02_dml/001_insert_movies.sql                    && echo "insert movies OK"  || (echo "insert movies NO" && exit 1)
+          test -f cinema/02_dml/002_insert_clients.sql                   && echo "insert clients OK" || (echo "insert clients NO" && exit 1)
+          test -f cinema/02_dml/003_insert_screening_rooms.sql           && echo "insert rooms OK"   || (echo "insert rooms NO" && exit 1)
+          test -f cinema/02_dml/004_insert_rentals.sql                   && echo "insert rentals OK" || (echo "insert rentals NO" && exit 1)
+          test -f cinema/changelog-master.yaml                           && echo "master OK"         || (echo "master NO" && exit 1)
+          test -f cinema/docker-compose.yml                              && echo "docker OK"         || (echo "docker NO" && exit 1)
+
+      - name: Check required YAML changelogs exist
+        run: |
+          test -f cinema/01_ddl/01_schemas/changelog.yaml  && echo "schema changelog OK" || (echo "schema changelog NO" && exit 1)
+          test -f cinema/01_ddl/03_tables/changelog.yaml   && echo "tables changelog OK" || (echo "tables changelog NO" && exit 1)
+          test -f cinema/02_dml/changelog.yaml             && echo "dml changelog OK"    || (echo "dml changelog NO" && exit 1)
+
+      - name: Validate YAML syntax
+        run: |
+          python3 -c "
+          import yaml, sys
+          files = [
+            'cinema/changelog-master.yaml',
+            'cinema/01_ddl/01_schemas/changelog.yaml',
+            'cinema/01_ddl/03_tables/changelog.yaml',
+            'cinema/02_dml/changelog.yaml',
+          ]
+          for f in files:
+            try:
+              yaml.safe_load(open(f))
+              print(f'YAML OK: {f}')
+            except yaml.YAMLError as e:
+              print(f'YAML ERROR: {f} -> {e}')
+              sys.exit(1)
+          "
+
+      - name: Validate SQL files are not empty
+        run: |
+          for f in \
+            cinema/01_ddl/01_schemas/001_create_schema.sql \
+            cinema/01_ddl/03_tables/001_create_movies_table.sql \
+            cinema/01_ddl/03_tables/002_create_clients_table.sql \
+            cinema/01_ddl/03_tables/003_create_screening_rooms_table.sql \
+            cinema/01_ddl/03_tables/004_create_rentals_table.sql \
+            cinema/02_dml/001_insert_movies.sql \
+            cinema/02_dml/002_insert_clients.sql \
+            cinema/02_dml/003_insert_screening_rooms.sql \
+            cinema/02_dml/004_insert_rentals.sql; do
+            [ -s "$f" ] && echo "NOT EMPTY: $f" || (echo "EMPTY: $f" && exit 1)
+          done
+
+      - name: Summary
+        run: echo "Todos los archivos de la BD validados correctamente"
